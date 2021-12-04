@@ -1,0 +1,24 @@
+return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints viewportConstraints) =>
+            GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.maxHeight,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    
+                  ],
+                ),
+              ),
+            ),
+        ),
+      ),
+    );
