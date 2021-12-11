@@ -178,7 +178,7 @@ class _SchoolSubmitScreenState extends State<SchoolSubmitScreen> {
           setState(() {
             _isLoading = false;
           });
-          await Navigator.of(context).pushNamed(appOpeningRoute);
+          await Navigator.of(context).pushNamed(interestViewRoute);
         } else {
           if (responseBody['message'] != null) {
             ToastMaker().simpleErrorToast(responseBody['message']);

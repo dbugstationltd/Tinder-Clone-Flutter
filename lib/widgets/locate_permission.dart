@@ -235,7 +235,7 @@ class _LocatePermissionState extends State<LocatePermission> {
           _isLoading = false;
         });
         await Navigator.of(context).pushNamedAndRemoveUntil(
-            bottomNavRoute, (Route<dynamic> route) => false);
+            appOpeningRoute, (Route<dynamic> route) => false);
       } else {
         if (responseBody['message'] != null) {
           ToastMaker().simpleErrorToast(responseBody['message']);

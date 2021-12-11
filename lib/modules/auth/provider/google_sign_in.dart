@@ -41,9 +41,7 @@ class GoogleSignInProvider extends ChangeNotifier {
 
       if ((responseBody['success'] != null) &&
           (responseBody['success'] == true)) {
-        if (responseBody['apiToken'] != null) {
-          prefs.setString(sApiToken, responseBody['apiToken']);
-        }
+        prefs.setString(sApiToken, responseBody['apiToken']);
         if (responseBody['availableSubscription'] != null) {
           prefs.setString(sAvailableSubscription,
               jsonEncode(responseBody['availableSubscription']));
@@ -53,16 +51,13 @@ class GoogleSignInProvider extends ChangeNotifier {
           Map responseBody = response.data;
           if (responseBody['success'] != null) {
             if (responseBody['success'] == true) {
-              if (responseBody['data'] != null) {
-                print("user data");
-                print(responseBody['data']);
-                prefs.setString(sUser, jsonEncode(responseBody['data']));
-              }
+              prefs.setString(sUser, jsonEncode(responseBody['data']));
             } else {
               ToastMaker().simpleErrorToast(defaultErrorMsg);
             }
           }
         } catch (e) {
+          print("error");
           ToastMaker().simpleErrorToast(defaultErrorMsg);
         }
       } else {

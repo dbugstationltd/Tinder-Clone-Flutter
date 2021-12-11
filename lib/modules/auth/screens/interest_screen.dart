@@ -270,7 +270,7 @@ class _InterestScreenState extends State<InterestScreen> {
           setState(() {
             _isLoading = false;
           });
-          await Navigator.of(context).pushNamed(appOpeningRoute);
+          await Navigator.of(context).pushNamed(uploadUserPhotosRoute);
         } else {
           if (responseBody['message'] != null) {
             ToastMaker().simpleErrorToast(responseBody['message']);

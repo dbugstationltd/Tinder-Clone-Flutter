@@ -25,7 +25,6 @@ class _AppOpenLoadingState extends State<AppOpenLoading> {
   void _checkLoggedInUser() async {
     SharedPreferences prefs = await _prefs;
     // await prefs.clear();
-    print(prefs.containsKey(sApiToken));
     if (prefs.containsKey(sApiToken)) {
       print(prefs.getString(sApiToken));
       var _user = await prefs.getString(sUser);
@@ -44,10 +43,6 @@ class _AppOpenLoadingState extends State<AppOpenLoading> {
       } else if (user.containsKey('gender') && user['gender'] == null) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
             setGenderRoute, (Route<dynamic> route) => false);
-      } else if ((user.containsKey('photos') && (user['photos'] == null)) ||
-          !user.containsKey('photos')) {
-        await Navigator.of(context).pushNamedAndRemoveUntil(
-            uploadUserPhotosRoute, (Route<dynamic> route) => false);
       } else if ((user.containsKey('school') && (user['school'] == null)) ||
           !user.containsKey('school')) {
         await Navigator.of(context).pushNamedAndRemoveUntil(

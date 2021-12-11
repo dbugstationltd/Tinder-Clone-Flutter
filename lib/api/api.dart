@@ -28,10 +28,8 @@ class CallApi {
 
   postData(data, apiUrl) async {
     var fullUrl = _url + apiUrl;
-    print(fullUrl);
-    
+
     var token = await _getToken();
-    print(token);
     String deviceId = await _getId();
     return await dio.post(
       fullUrl,

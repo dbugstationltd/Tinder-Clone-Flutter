@@ -256,7 +256,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
           setState(() {
             _isLoading = false;
           });
-          await Navigator.of(context).pushNamed(bottomNavRoute);
+          await Navigator.of(context).pushNamed(appOpeningRoute);
         } else {
           if (responseBody['message'] != null) {
             ToastMaker().simpleErrorToast(responseBody['message']);
