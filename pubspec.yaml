@@ -33,8 +33,9 @@ dependencies:
   uuid: ^3.0.5
   path_provider: ^2.0.7
   rename: ^2.0.1
-  firebase_auth: ^3.2.0
   google_sign_in: ^5.2.1
+  firebase_auth: ^3.2.0
+  firebase_database: ^9.0.1
   firebase_core: ^1.10.0
   country_code_picker: ^2.0.2
 

@@ -28,25 +28,19 @@ class GoogleSignInProvider extends ChangeNotifier {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    await FirebaseAuth.instance.signInWithCredential(credential);
 
     var data = {
       'providerName': 'google',
       'providerAccessToken': googleAuth.accessToken,
     };
-    print(data);
 
     try {
       Response response = await CallApi().postData(data, socialLoginRoute);
       final SharedPreferences prefs = await _prefs;
       Map responseBody = response.data;
-      print(responseBody);
+
       if ((responseBody['success'] != null) &&
           (responseBody['success'] == true)) {
-        if (responseBody['user'] != null) {
-          prefs.setString(sUser, jsonEncode(responseBody['user']));
-        }
-
         if (responseBody['apiToken'] != null) {
           prefs.setString(sApiToken, responseBody['apiToken']);
         }
@@ -54,8 +48,22 @@ class GoogleSignInProvider extends ChangeNotifier {
           prefs.setString(sAvailableSubscription,
               jsonEncode(responseBody['availableSubscription']));
         }
-        if (responseBody['message'] != null) {
-          ToastMaker().simpleToast(responseBody['message']);
+        try {
+          Response response = await CallApi().getData(userProfileRoute);
+          Map responseBody = response.data;
+          if (responseBody['success'] != null) {
+            if (responseBody['success'] == true) {
+              if (responseBody['data'] != null) {
+                print("user data");
+                print(responseBody['data']);
+                prefs.setString(sUser, jsonEncode(responseBody['data']));
+              }
+            } else {
+              ToastMaker().simpleErrorToast(defaultErrorMsg);
+            }
+          }
+        } catch (e) {
+          ToastMaker().simpleErrorToast(defaultErrorMsg);
         }
       } else {
         if (responseBody['message'] != null) {
@@ -69,6 +77,7 @@ class GoogleSignInProvider extends ChangeNotifier {
     }
 
     // await Future.delayed(Duration(seconds: 5));
+    await FirebaseAuth.instance.signInWithCredential(credential);
 
     notifyListeners();
   }

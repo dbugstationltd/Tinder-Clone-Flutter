@@ -41,14 +41,13 @@ class _AppOpenLoadingState extends State<AppOpenLoading> {
           !user.containsKey('birthdate')) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
             birthSubmitRoute, (Route<dynamic> route) => false);
-      } else if ((user.containsKey('gender') && (user['gender'] == null)) ||
-          !user.containsKey('gender')) {
+      } else if (user.containsKey('gender') && user['gender'] == null) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
             setGenderRoute, (Route<dynamic> route) => false);
       } else if ((user.containsKey('photos') && (user['photos'] == null)) ||
           !user.containsKey('photos')) {
         await Navigator.of(context).pushNamedAndRemoveUntil(
-            setGenderRoute, (Route<dynamic> route) => false);
+            uploadUserPhotosRoute, (Route<dynamic> route) => false);
       } else if ((user.containsKey('school') && (user['school'] == null)) ||
           !user.containsKey('school')) {
         await Navigator.of(context).pushNamedAndRemoveUntil(

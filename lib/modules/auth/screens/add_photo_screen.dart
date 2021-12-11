@@ -301,7 +301,7 @@ class _AddPhotoScreenState extends State<AddPhotoScreen> {
           setState(() {
             _isLoading = false;
           });
-          await Navigator.of(context).pushNamed(locationPermissionRoute);
+          await Navigator.of(context).pushNamed(appOpeningRoute);
         } else {
           if (responseBody['message'] != null) {
             ToastMaker().simpleErrorToast(responseBody['message']);

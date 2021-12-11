@@ -66,7 +66,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       Response response = await CallApi().getData(userExploreRoute);
 
       Map responseBody = response.data;
-      print(responseBody);
       if (responseBody['success'] != null) {
         if (responseBody['success'] == true) {
           var responseData = responseBody['data'];
@@ -111,6 +110,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   .toList();
             });
           }
+          print(recentlyActive);
+          print(commonInterest);
+          print(recomended);
         } else {
           await Navigator.of(context).pushNamedAndRemoveUntil(
               loginViewRoute, (Route<dynamic> route) => false);
@@ -263,16 +265,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => const UserProfileScreen(),
+                  builder: (context) => UserProfileScreen(userId: userInfo.id),
                 ),
               );
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6.0),
               child: CachedNetworkImage(
-                imageUrl: userInfo.profile_pic != ""
-                    ? photoBucket + userInfo.profile_pic.toString()
-                    : defaultNoImageUrl,
+                imageUrl: Helper().getImageUrl(userInfo.profile_pic),
                 fit: BoxFit.cover,
                 height: 278.0,
                 width: (MediaQuery.of(context).size.width / 2) -
@@ -291,9 +291,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     Row(
                       children: [
                         Text(
-                          userInfo.name != ""
-                              ? Helper().getFirstWord(userInfo.name)
-                              : "Jhon",
+                          Helper().getNameFirstWord(userInfo.name),
                           style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'Roboto',

@@ -22,5 +22,6 @@ const String socialLoginRoute = '/socialLogin';
 const String createUserWithPhone = '/createUserWithPhone';
 const String updateProfilePic = '/updateProfilePic';
 const String userProfileRoute = '/userProfile';
+const String personProfileRoute = '/personProfile';
 const String uploadUserPhotosRoute = '/uploadUserPhotos';
 const String userExploreRoute = '/userExplore';

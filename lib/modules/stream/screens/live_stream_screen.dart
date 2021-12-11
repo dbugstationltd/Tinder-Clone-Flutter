@@ -680,7 +680,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
         Navigator.push(
           context,
           CupertinoPageRoute(
-            builder: (context) => const UserProfileScreen(),
+            builder: (context) => UserProfileScreen(userId: 92,),
           ),
         );
       },

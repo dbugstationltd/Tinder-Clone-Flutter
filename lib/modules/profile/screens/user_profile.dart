@@ -1,16 +1,18 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loveria/api/api.dart';
 import 'package:loveria/config/routes/routing_constants.dart';
-import 'package:loveria/utils/data/data.dart';
 import 'package:loveria/utils/helpers/constants.dart';
 import 'package:loveria/utils/helpers/helpers.dart';
 import 'package:loveria/utils/helpers/styles.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  const UserProfileScreen({Key? key}) : super(key: key);
+  final int userId;
+  const UserProfileScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   _UserProfileScreenState createState() => _UserProfileScreenState();
@@ -18,60 +20,61 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   bool _showVideos = false;
+  late Future<Map<String, dynamic>> profileUser;
 
   var userProfile;
 
   @override
   void initState() {
-    Helper().checkLoggedInUser(context);
-    _getInterestList();
     super.initState();
+    Helper().checkLoggedInUser(context);
+    profileUser = fetchUser();
   }
 
-  Future _getInterestList() async {
-    bool internetConnected = await CheckInternet().checkInternet();
-
-    if (internetConnected != true) {
-      return ToastMaker().simpleErrorToast('Check your internet connection.');
-    }
-    FocusScope.of(context).requestFocus(FocusNode());
-
-    try {
-      Response response = await CallApi().getData('/personProfile/6');
-      Map responseBody = response.data;
-      if (responseBody['success'] != null) {
-        if (responseBody['success'] == true) {
-          userProfile = responseBody['user'];
-        } else {
-          await Navigator.of(context).pushNamedAndRemoveUntil(
-              loginViewRoute, (Route<dynamic> route) => false);
-          if (responseBody['message'] != null) {
-            ToastMaker().simpleErrorToast(responseBody['message']);
-          } else {
-            ToastMaker().simpleErrorToast(defaultErrorMsg);
-          }
-        }
+  Future<Map<String, dynamic>> fetchUser() async {
+    Response response = await CallApi()
+        .getData(personProfileRoute + '/' + widget.userId.toString());
+    Map<String, dynamic> responseBody = response.data;
+    if (responseBody['success'] != null) {
+      if (responseBody['success'] == true) {
+        return responseBody['data'];
+      } else {
+        throw Exception('Failed to load album');
       }
-    } catch (e) {
-      ToastMaker().simpleErrorToast(defaultErrorMsg);
+    } else {
+      throw Exception('Failed to load album');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        physics: const ClampingScrollPhysics(),
-        slivers: [
-          _buildBody(),
-          _buildMediaTabBar(),
-          _buildMediaBox(),
-        ],
+      body: Center(
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: profileUser,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return CustomScrollView(
+                physics: ClampingScrollPhysics(),
+                slivers: [
+                  _buildBody(snapshot),
+                  _buildMediaTabBar(),
+                  _buildMediaBox(snapshot),
+                ],
+              );
+              // return Text(snapshot.data!['name']);
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
+            // By default, show a loading spinner.
+            return CircularProgressIndicator();
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildIndicator() => Padding(
+  Widget _buildIndicator(List img) => Padding(
         padding: EdgeInsets.symmetric(
           horizontal: 10.0,
           vertical: MediaQuery.of(context).padding.top + kDefaultPadding,
@@ -79,17 +82,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildIndicatorIcon(true),
-            _buildIndicatorIcon(false),
-            _buildIndicatorIcon(false),
-            _buildIndicatorIcon(false),
-            _buildIndicatorIcon(false),
+            for (var i in img)
+              i == 0 ? _buildIndicatorIcon(true) : _buildIndicatorIcon(false),
           ],
         ),
       );
 
   Widget _buildIndicatorIcon(bool currentImage) => Padding(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(4),
         child: Container(
           height: 9,
           width: 9,
@@ -100,7 +100,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
       );
 
-  SliverToBoxAdapter _buildBody() {
+  SliverToBoxAdapter _buildBody(AsyncSnapshot snapshot) {
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -109,7 +109,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Container(
                 height: MediaQuery.of(context).size.height / 2,
                 width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.0),
                     bottomRight: Radius.circular(30.0),
@@ -123,25 +123,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30.0),
                     bottomRight: Radius.circular(30.0),
                   ),
                   child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    imageUrl: users[0].profileImageUrl,
+                    imageUrl: Helper().getLastThreeImageUrl(
+                        snapshot.data['userPhotoLastThree']),
                     useOldImageOnUrlChange: true,
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0, vertical: 40.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 40.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded),
+                      icon: Icon(Icons.arrow_back_rounded),
                       iconSize: 30.0,
                       color: kSecondaryTextColor,
                       onPressed: () => Navigator.pop(context),
@@ -149,38 +149,38 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ],
                 ),
               ),
-              _buildIndicator(),
+              _buildIndicator(snapshot.data['userPhotoLastThree']),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.all(kDefaultPadding),
+            padding: EdgeInsets.all(kDefaultPadding),
             child: Column(
               children: [
                 Row(
                   children: [
-                    const Text(
-                      'Jessica',
+                    Text(
+                      Helper().getNameFirstWord(snapshot.data['name']),
                       style: TextStyle(
                         fontSize: 36.0,
                         color: Color(0xFF474747),
                       ),
                     ),
-                    const SizedBox(width: 22.0),
-                    const Text(
-                      '22',
+                    SizedBox(width: 22.0),
+                    Text(
+                      snapshot.data['birthdate'].toString(),
                       style: TextStyle(
                         fontSize: 26.0,
                         color: Color(0xFF474747),
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(width: 10.0),
+                    SizedBox(width: 10.0),
                     _buildFollowButton(),
                   ],
                 ),
-                const SizedBox(height: 18.0),
+                SizedBox(height: 18.0),
                 Row(
-                  children: const [
+                  children: [
                     Icon(
                       FontAwesomeIcons.graduationCap,
                       color: Color(0xFFA2A2A2),
@@ -188,7 +188,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     SizedBox(width: kDefaultPadding / 2),
                     Text(
-                      'IBA, University of Dhaka',
+                      Helper().checkNullString(snapshot.data['school']),
                       style: TextStyle(
                         fontSize: 16.0,
                         fontFamily: 'Roboto',
@@ -198,9 +198,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10.0),
+                SizedBox(height: 10.0),
                 Row(
-                  children: const [
+                  children: [
                     Icon(
                       FontAwesomeIcons.mapMarkerAlt,
                       color: Color(0xFFA2A2A2),
@@ -218,10 +218,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-                const Divider(color: Color(0xFFA2A2A2)),
-                const SizedBox(height: 10.0),
+                Divider(color: Color(0xFFA2A2A2)),
+                SizedBox(height: 10.0),
                 Row(
-                  children: const [
+                  children: [
                     Text(
                       'About',
                       style: TextStyle(
@@ -233,12 +233,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: kDefaultPadding),
+                SizedBox(height: kDefaultPadding),
                 Row(
-                  children: const [
+                  children: [
                     Flexible(
                       child: Text(
-                        'Amet minim mollit non deserunt ullamco est sit aliqua dolor done amet sint. Velit officia consequat duis  consequat duis enim velit mollit.',
+                        Helper().checkNullString(snapshot.data['aboutMe']),
                         maxLines: 5,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
@@ -252,11 +252,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: kDefaultPadding / 2),
-                const Divider(color: Color(0xFFA2A2A2)),
-                const SizedBox(height: kDefaultPadding * 1.5),
+                SizedBox(height: kDefaultPadding / 2),
+                Divider(color: Color(0xFFA2A2A2)),
+                SizedBox(height: kDefaultPadding * 1.5),
                 Row(
-                  children: const [
+                  children: [
                     Text(
                       'Passions',
                       style: TextStyle(
@@ -268,17 +268,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Wrap(
                   direction: Axis.horizontal,
                   spacing: 4.0,
                   runSpacing: 4,
                   children: [
-                    _buildPassion("Music", true),
-                    _buildPassion('Sports', true),
-                    _buildPassion('Shopping', false),
-                    _buildPassion('Games', false),
-                    _buildPassion('Travel', false),
+                    for (var i in snapshot.data['interests'])
+                      _buildPassion(i['interestName'], false),
                   ],
                 ),
               ],
@@ -344,7 +341,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  SliverToBoxAdapter _buildMediaBox() {
+  SliverToBoxAdapter _buildMediaBox(AsyncSnapshot snapshot) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(kDefaultPadding / 2),
@@ -352,7 +349,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              if (!_showVideos) _buildPhotosWindow(),
+              if (!_showVideos) _buildPhotosWindow(snapshot.data['photos']),
               if (_showVideos) _buildVideosWindow()
             ],
           ),
@@ -361,7 +358,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Widget _buildPhotosWindow() {
+  Widget _buildPhotosWindow(List photos) {
     return SizedBox(
       height: MediaQuery.of(context).size.width / 1.3,
       child: GridView.count(
@@ -369,7 +366,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         childAspectRatio: (MediaQuery.of(context).size.width /
             MediaQuery.of(context).size.width),
         children: List.generate(
-          profile.media.length,
+          photos.length,
           (index) => Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -379,7 +376,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6.0),
               child: CachedNetworkImage(
-                imageUrl: profile.media[index],
+                imageUrl: Helper().getImageUrl(photos[index]['imageUrl']),
                 fit: BoxFit.cover,
                 height: (MediaQuery.of(context).size.width / 3) -
                     (kDefaultPadding * 3),

@@ -6,7 +6,9 @@ import 'package:loveria/models/models.dart';
 import 'package:loveria/modules/search/provider/card_provider.dart';
 import 'package:loveria/utils/helpers/constants.dart';
 import 'package:loveria/utils/helpers/enums.dart';
+import 'package:loveria/utils/helpers/helpers.dart';
 import 'package:loveria/utils/helpers/styles.dart';
+import 'package:loveria/utils/screens/screen.dart';
 import 'package:provider/provider.dart';
 
 class SwipeCard extends StatefulWidget {
@@ -38,12 +40,12 @@ class _SwipeCardState extends State<SwipeCard> {
   }
 
   void checkImageUrl() async {
-    if (widget.swipeUser.profilePic != "") {
-      setState(() {
-        // _image = photoBucket + widget.swipeUser.userPhotoLastThree[0].imageUrl;
-        _image = photoBucket + widget.swipeUser.profilePic;
-      });
-    }
+    String image = await Helper()
+        .getLastThreeImageUrl(widget.swipeUser.userPhotoLastThree);
+    setState(() {
+      _image = image;
+    });
+    print(_image);
   }
 
   @override
@@ -153,18 +155,30 @@ class _SwipeCardState extends State<SwipeCard> {
 
   Widget _buildName() => Row(
         children: [
-          Text(
-            getFirstWord(widget.swipeUser.name),
-            style: const TextStyle(
-              color: kPrimaryTextColor,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w700,
-              fontSize: 36.0,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserProfileScreen(
+                    userId: widget.swipeUser.id,
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              Helper().getNameFirstWord(widget.swipeUser.name),
+              style: const TextStyle(
+                color: kPrimaryTextColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w700,
+                fontSize: 36.0,
+              ),
             ),
           ),
           const SizedBox(width: 15.0),
           Text(
-            '21',
+            Helper().checkNullString(widget.swipeUser.birthdate.toString()),
             style: const TextStyle(
               color: kPrimaryTextColor,
               fontFamily: 'Roboto',
@@ -345,14 +359,5 @@ class _SwipeCardState extends State<SwipeCard> {
         ),
       ),
     );
-  }
-
-  static String getFirstWord(String inputString) {
-    List<String> wordList = inputString.split(" ");
-    if (inputString.length > 0) {
-      return wordList[0];
-    } else {
-      return ' ';
-    }
   }
 }

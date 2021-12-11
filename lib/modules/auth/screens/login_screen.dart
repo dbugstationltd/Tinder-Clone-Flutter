@@ -215,28 +215,28 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: Colors.transparent,
-        body: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light,
-          child: _buldBody(),
-        ),
+        body:
+            // AnnotatedRegion<SystemUiOverlayStyle>(
+            //   value: SystemUiOverlayStyle.light,
+            //   child: _buldBody(),
+            // ),
 
-        // StreamBuilder(
-        //   stream: FirebaseAuth.instance.authStateChanges(),
-        //   builder: (context, snapshot) {
-        //     if (snapshot.connectionState == ConnectionState.waiting) {
-        //       return Center(child: CircularProgressIndicator());
-        //     } else if (snapshot.hasData) {
-        //       print("asdf");
-        //       print(snapshot);
-        //       return BottomNavScreen();
-        //     } else {
-        //       return AnnotatedRegion<SystemUiOverlayStyle>(
-        //         value: SystemUiOverlayStyle.light,
-        //         child: _buldBody(),
-        //       );
-        //     }
-        //   },
-        // ),
+            StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasData) {
+              print(snapshot);
+              return AppOpenLoading();
+            } else {
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiOverlayStyle.light,
+                child: _buldBody(),
+              );
+            }
+          },
+        ),
       );
 
   Widget _buldBody() => GestureDetector(
@@ -534,19 +534,19 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () async {
         if (_isLoading) return;
         if (loginText == "LOG IN WITH GOOGLE") {
-          setState(() {
-            _isLoading = true;
-          });
+          // setState(() {
+          //   _isLoading = true;
+          // });
           final provider =
               Provider.of<GoogleSignInProvider>(this.context, listen: false);
           provider.logout();
           provider.googleLogin();
-          setState(() {
-            _isLoading = false;
-          });
-          // Future.delayed(Duration(seconds: 2));
-          Navigator.of(this.context).pushNamedAndRemoveUntil(
-              appOpeningRoute, (Route<dynamic> route) => false);
+          // setState(() {
+          //   _isLoading = false;
+          // });
+          // await Future.delayed(Duration(seconds: 2));
+          // Navigator.of(this.context).pushNamedAndRemoveUntil(
+          //     appOpeningRoute, (Route<dynamic> route) => false);
         } else if (loginText == "LOG IN WITH PHONE NUMBER") {
           Navigator.push(
             this.context,

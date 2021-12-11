@@ -72,7 +72,9 @@ class _RecentlyActiveScreenState extends State<RecentlyActiveScreen> {
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      builder: (context) => const UserProfileScreen(),
+                      builder: (context) => UserProfileScreen(
+                        userId: users[index]['id'],
+                      ),
                     ),
                   );
                 },
@@ -87,9 +89,8 @@ class _RecentlyActiveScreenState extends State<RecentlyActiveScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(6.0),
                         child: CachedNetworkImage(
-                          imageUrl: users[index]['profile_pic'] != null
-                              ? photoBucket + users[index]['profile_pic']
-                              : defaultNoImageUrl,
+                          imageUrl:
+                              Helper().getImageUrl(users[index]['profile_pic']),
                           fit: BoxFit.cover,
                           height: 278.0,
                           width: (MediaQuery.of(context).size.width / 2) -
@@ -112,10 +113,8 @@ class _RecentlyActiveScreenState extends State<RecentlyActiveScreen> {
                                     Row(
                                       children: [
                                         Text(
-                                          users[index]['name'] != null
-                                              ? Helper().getFirstWord(
-                                                  users[index]['name'])
-                                              : "Jhon",
+                                          Helper().getNameFirstWord(
+                                              users[index]['name']),
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontFamily: 'Roboto',

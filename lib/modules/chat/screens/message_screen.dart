@@ -42,40 +42,28 @@ class _MessageScreenState extends State<MessageScreen> {
           Navigator.pop(context);
         },
       ),
-      title: InkWell(
-        onTap: () {
-          {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => const UserProfileScreen(),
-              ),
-            );
-          }
-        },
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: CachedNetworkImage(
-                fit: BoxFit.cover,
-                imageUrl: users[0].profileImageUrl,
-                useOldImageOnUrlChange: true,
-                height: 40,
-                width: 40,
-              ),
+      title: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: CachedNetworkImage(
+              fit: BoxFit.cover,
+              imageUrl: users[0].profileImageUrl,
+              useOldImageOnUrlChange: true,
+              height: 40,
+              width: 40,
             ),
-            const SizedBox(width: kDefaultPadding * 0.75),
-            const Text(
-              "Flores",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF474747),
-              ),
-            )
-          ],
-        ),
+          ),
+          const SizedBox(width: kDefaultPadding * 0.75),
+          const Text(
+            "Flores",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF474747),
+            ),
+          )
+        ],
       ),
       actions: [
         SizedBox(

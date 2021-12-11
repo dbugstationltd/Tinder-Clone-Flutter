@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:loveria/models/models.dart';
 import 'package:loveria/modules/search/provider/card_provider.dart';
 import 'package:loveria/modules/search/repositories/swipe_card.dart';
 import 'package:loveria/utils/helpers/constants.dart';
 import 'package:loveria/utils/helpers/styles.dart';
 import 'package:loveria/utils/screens/screen.dart';
+import 'package:loveria/utils/services/services.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -32,6 +34,7 @@ class SearchScreenMain extends StatefulWidget {
 }
 
 class _SearchScreenMainState extends State<SearchScreenMain> {
+  final liked = LikedDao();
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: const PreferredSize(
@@ -52,6 +55,12 @@ class _SearchScreenMainState extends State<SearchScreenMain> {
           ),
         ),
       );
+
+  void _sendLike() {
+    final like = Liked(2, 1, DateTime.now());
+    liked.saveLikes(like);
+    setState(() {});
+  }
 
   Widget _buildButtons() {
     final provider = Provider.of<CardProvider>(context);
@@ -148,6 +157,7 @@ class _SearchScreenMainState extends State<SearchScreenMain> {
                     final provider =
                         Provider.of<CardProvider>(context, listen: false);
                     provider.like();
+                    _sendLike();
                   },
                   child: Container(
                     decoration: BoxDecoration(

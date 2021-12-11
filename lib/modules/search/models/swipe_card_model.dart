@@ -6,6 +6,7 @@ class SwipeUser {
   String aboutMe;
   String jobTitle;
   String company;
+  int birthdate;
   String email;
   String contactNo;
   String latitude;
@@ -36,6 +37,7 @@ class SwipeUser {
     required this.jobTitle,
     required this.company,
     required this.email,
+    required this.birthdate,
     required this.contactNo,
     required this.latitude,
     required this.longitude,
@@ -73,6 +75,7 @@ class SwipeUser {
       name: json['name'],
       aboutMe: json['aboutMe'],
       jobTitle: json['jobTitle'],
+      birthdate: json['birthdate'],
       company: json['company'],
       email: json['email'],
       contactNo: json['contactNo'],
@@ -107,6 +110,7 @@ class SwipeUser {
       'jobTitle': jobTitle,
       'company': company,
       'email': email,
+      'birthdate': birthdate,
       'contactNo': contactNo,
       'latitude': latitude,
       'longitude': longitude,

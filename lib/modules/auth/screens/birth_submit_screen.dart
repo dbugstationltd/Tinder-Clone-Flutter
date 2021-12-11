@@ -141,11 +141,12 @@ class _BirthSubmitScreenState extends State<BirthSubmitScreen> {
         _isLoading = true;
       });
 
-      var _bdate = Helper().getFirstWord(date.toString());
+      var _bdate = Helper().getDate(date.toString());
 
       var data = {
         'birthdate': _bdate,
       };
+      // print(_)
 
       try {
         // FormData formData = new FormData.fromMap(data);
@@ -157,13 +158,14 @@ class _BirthSubmitScreenState extends State<BirthSubmitScreen> {
           if (responseBody['user'] != null) {
             var _user = prefs.getString(sUser);
             var user = json.decode(_user!);
+            print(responseBody['user']);
             user['birthdate'] = responseBody['user']['birthdate'];
             prefs.setString(sUser, jsonEncode(user));
           }
           setState(() {
             _isLoading = false;
           });
-          await Navigator.of(context).pushNamed(setGenderRoute);
+          await Navigator.of(context).pushNamed(appOpeningRoute);
         } else {
           if (responseBody['message'] != null) {
             ToastMaker().simpleErrorToast(responseBody['message']);
